@@ -219,7 +219,15 @@ void NNApi::addPooling(
     reportError(result_code);
   }
 }
-
+  
+void NNApi::addFC(const OperationDef& op, bool fuse_relu){
+  int result_code = libnnapi_.ANeuralNetworksModel_addOperation(
+      model_, op_code, input_indices_count, input_indices, 1, output_indices);
+  if (result_code != ANEURALNETWORKS_NO_ERROR) {
+    reportError(result_code);
+  }
+}
+  
 void NNApi::addConv(const OperatorDef& op, bool fuse_relu) {
   VLOG(1) << "Add Conv to NN model";
   CAFFE_ENFORCE_EQ(op.input_size(), 3);
