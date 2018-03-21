@@ -76,6 +76,7 @@ class NNApi {
     MAXPOOL,
     RELU,
     SOFTMAX,
+    FULLCONNECTION,
   };
 
   std::unordered_map<std::string, OperatorType> operator_map_{
