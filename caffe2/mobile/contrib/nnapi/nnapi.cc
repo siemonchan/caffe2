@@ -219,15 +219,30 @@ void NNApi::addPooling(
     reportError(result_code);
   }
 }
-  
-void NNApi::addFC(const OperationDef& op, bool fuse_relu){
+
+void NNApi::addFC(const OperatorDfr& op, bool fuse_relu){
+  VLOG(1) << "Add Fully-Connecterd to NN model";
+  CAFFE_ENFORCE_EQ(op.input_size(), 1);
+  CAFFE_ENFORCE_EQ(op.output_size(), 1);
+  ArgumentHelper helper(op);
+  StorageOrder order = StringToStorageOrder(
+      helper.GetSingleArgument<std::string>("order", "NCHW"));
+  if (order == NCHW) {
+    CAFFE_THROW("NN API supports NHWC only");
+  }
+
+  const uint32_t input_indices_count = 4;
+  const uint32_t output_indices_count = 1;
+  uint32_t input_indices[input_indices_count];
+  uint32_t output_indices[output_indices_count];
+
   int result_code = libnnapi_.ANeuralNetworksModel_addOperation(
       model_, op_code, input_indices_count, input_indices, 1, output_indices);
   if (result_code != ANEURALNETWORKS_NO_ERROR) {
     reportError(result_code);
   }
 }
-  
+
 void NNApi::addConv(const OperatorDef& op, bool fuse_relu) {
   VLOG(1) << "Add Conv to NN model";
   CAFFE_ENFORCE_EQ(op.input_size(), 3);
@@ -610,6 +625,9 @@ void NNApi::init(const TensorVector& inputs, TensorVector* outputs) {
           break;
         case SOFTMAX:
           addSoftmax(op);
+          break;
+        case FULLY-CONNECTED:
+          addFC(op);
           break;
         default:
           CAFFE_THROW("Unsupported operator");

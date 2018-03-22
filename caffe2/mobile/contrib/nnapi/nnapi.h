@@ -76,7 +76,7 @@ class NNApi {
     MAXPOOL,
     RELU,
     SOFTMAX,
-    FULLCONNECTION,
+    FULLY-CONNECTED,
   };
 
   std::unordered_map<std::string, OperatorType> operator_map_{
@@ -84,7 +84,8 @@ class NNApi {
       {"Conv", CONV},
       {"MaxPool", MAXPOOL},
       {"Relu", RELU},
-      {"Softmax", SOFTMAX}};
+      {"Softmax", SOFTMAX}
+      {"Fully-Connected",FULLY-CONNECTED}};
 
   struct ConvPoolArgs {
     int kernel_h{0};
@@ -114,6 +115,8 @@ class NNApi {
   void init(const TensorVector& inputs, TensorVector* outputs);
 
   void addConv(const OperatorDef& op, bool fuse_relu = false);
+
+  void addFC(const OperatorDef op, bool fuse_relu = false);
 
   void addPooling(
       const OperatorDef& op,
